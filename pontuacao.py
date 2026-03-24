@@ -8,7 +8,7 @@ class Pontuacao(Turtle):
         self.hideturtle()       # Oculta o ícone da tartaruga; queremos ver apenas o texto
         self.pontuacao = 0      # Atributo que armazena o valor numérico do score
         self.penup()            # Garante que a tartaruga não risque a tela ao se posicionar
-        self.goto(-220, 150)    # Posiciona o placar no canto superior esquerdo (HUD)
+        self.goto(-250, 130)    # Posiciona o placar no canto superior esquerdo (HUD)
         self.pontuacao_config() # Renderiza o texto inicial (0)
 
     def pontuacao_config(self):

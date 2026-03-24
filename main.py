@@ -8,7 +8,9 @@ from pontuacao import Pontuacao
 
 # --- CONFIGURAÇÃO DO AMBIENTE PADRÃO---
 tela = Screen()
+nome = tela.textinput("Tartaruga Esperta", "Digite seu nome:") # Prompt para o nome do jogador
 tela.setup(600, 600)  # Define a resolução da janela
+tela.bgcolor ('beige') # Cor de fundo para melhor contraste visual
 tela.tracer(0)        # Desliga a animação automática para controle manual de frames (performance)
 tela.title("Tartaruga esperta")
 tela.listen()         # Habilita a escuta de eventos do teclado
@@ -19,39 +21,89 @@ jogador = Jogador()         # Inicializa o avatar do player
 carro_config = CarroConfig() # Inicializa o gerenciador de obstáculos
 pontuacao = Pontuacao()     # Inicializa a interface de score
 
+# Turtle para mensagem de fim de jogo (não sobreposta)
+mensagem_fim = turtle.Turtle()
+mensagem_fim.hideturtle()
+mensagem_fim.penup()
+
+# Turtle para botão de reiniciar
+botao_reiniciar = turtle.Turtle()
+botao_reiniciar.hideturtle()
+botao_reiniciar.penup()
+
 # --- MAPEAMENTO DE INPUTS ---
 tela.onkey(jogador.mover_direita, 'Right') # Bind da tecla Direita
 tela.onkey(jogador.mover_esquerda, 'Left') # Bind da tecla Esquerda
 
-# --- LOOP PRINCIPAL DO JOGO (GAME LOOP) ---
-jogo_on = True
-while jogo_on == True:
-    time.sleep(0.1)             # Controla o "Frame Rate" (velocidade do loop)
-    carro_config.aparecer_carro() # Verifica se precisa gerar novos carros no topo
-    carro_config.mover_carro()    # Atualiza a posição Y de todos os carros ativos
+def desenhar_botao_reiniciar():
+    botao_reiniciar.clear()
+    botao_reiniciar.goto(-90, -120)
+    botao_reiniciar.pendown()
+    botao_reiniciar.color('white', 'darkgreen')
+    botao_reiniciar.begin_fill()
+    for _ in range(2):
+        botao_reiniciar.forward(180)
+        botao_reiniciar.left(90)
+        botao_reiniciar.forward(40)
+        botao_reiniciar.left(90)
+    botao_reiniciar.end_fill()
+    botao_reiniciar.penup()
+    botao_reiniciar.goto(0, -110)
+    botao_reiniciar.color('white')
+    botao_reiniciar.write('Reiniciar', align='center', font=('Arial', 16, 'bold'))
 
-    # CHECK 1: Verificação de Limites da Pista (Out of Bounds)
-    if jogador.xcor() > 120 or jogador.xcor() < -120:
-        turtle.write("Fim de jogo", align='center', font=('Arial', 50, 'normal'))
-        jogo_on = False # Quebra o loop principal
 
-    # LOOP DE PROCESSAMENTO DE OBSTÁCULOS
+def game_over():
+    mensagem_fim.clear()
+    mensagem_fim.goto(0, 0)
+    mensagem_fim.write('Fim de jogo', align='center', font=('Arial', 50, 'normal'))
+    mensagem_fim.goto(0, -40)
+    mensagem_fim.write(f'Pontuação final: {pontuacao.pontuacao}', align='center', font=('Arial', 30, 'normal'))
     for carrinho in carro_config.carros:
-        # CHECK 2: Detecção de Colisão (Lógica de proximidade Euclidiana)
-        # Verifica se estão na mesma faixa (x) e se a distância física é menor que 65px
-        if abs(jogador.xcor() - carrinho.xcor()) < 1 and jogador.distance(carrinho) < 65:
-            turtle.write("Fim de jogo", align='center', font=('Arial', 50, 'normal'))
+        carrinho.hideturtle()
+    carro_config.carros.clear()
+    desenhar_botao_reiniciar()
+    tela.onscreenclick(reiniciar_jogo)
+
+
+def reiniciar_jogo(x, y):
+    if -90 <= x <= 90 and -120 <= y <= -80:
+        botao_reiniciar.clear()
+        mensagem_fim.clear()
+        pontuacao.clear()
+        pontuacao.pontuacao = 0
+        pontuacao.pontuacao_config()
+        jogador.goto(0, -220)
+        tela.onscreenclick(None)
+        iniciar_jogo()
+
+
+def iniciar_jogo():
+    jogo_on = True
+    while jogo_on:
+        time.sleep(0.1)
+        carro_config.aparecer_carro()
+        carro_config.mover_carro()
+
+        if jogador.xcor() > 120 or jogador.xcor() < -120:
+            game_over()
             jogo_on = False
 
-        # CHECK 3: Garbage Collection & Pontuação
-        # Se o carro ultrapassar o limite inferior da tela (-230)
-        if carrinho.ycor() < -230:
-            pontuacao.aumentar_pontuacao()      # Incrementa o score
-            carrinho.hideturtle()              # Remove o objeto visualmente
-            carro_config.carros.remove(carrinho) # Remove o objeto da memória (lista)
+        for carrinho in carro_config.carros:
+            if abs(jogador.xcor() - carrinho.xcor()) < 1 and jogador.distance(carrinho) < 65:
+                game_over()
+                jogo_on = False
+                break
 
-    # RENDERIZAÇÃO: Atualiza todos os desenhos de uma vez (evita flickering)
-    tela.update()
+            if carrinho.ycor() < -230:
+                pontuacao.aumentar_pontuacao()
+                carrinho.hideturtle()
+                carro_config.carros.remove(carrinho)
 
-# Mantém a janela aberta após o Game Over até um clique manual
-tela.exitonclick()
+        tela.update()
+
+
+iniciar_jogo()
+
+# Mantém a janela aberta após o Game Over até o usuário clicar no botão reiniciar
+tela.mainloop()

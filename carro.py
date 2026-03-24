@@ -15,7 +15,7 @@ class CarroConfig:
     def criar_carro(self):
         """Instancia um novo objeto Turtle com propriedades de obstáculo."""
         novo_carro = Turtle()
-        cores = ['brown', 'black', 'cyan', 'grey', 'green', 'yellow', 'purple']
+        cores = ['brown', 'black', 'white', 'cyan', 'grey', 'green', 'yellow', 'purple']
         
         novo_carro.shape('square')      # Define o corpo do carro como um quadrado
         novo_carro.shapesize(3, 3.2)    # Estica o quadrado para parecer um retângulo/carro
