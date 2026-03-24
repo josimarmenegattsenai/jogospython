@@ -13,6 +13,7 @@ class CarroConfig:
         novo_carro.shapesize(3,3.2)
         novo_carro.setheading(270)
         novo_carro.color(random.choice(cores))
+        novo_carro.penup()
         novo_carro.goto(random.choice(self.local))
         self.carros.append(novo_carro)
 
