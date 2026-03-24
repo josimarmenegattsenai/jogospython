@@ -26,32 +26,9 @@ mensagem_fim = turtle.Turtle()
 mensagem_fim.hideturtle()
 mensagem_fim.penup()
 
-# Turtle para botão de reiniciar
-botao_reiniciar = turtle.Turtle()
-botao_reiniciar.hideturtle()
-botao_reiniciar.penup()
-
 # --- MAPEAMENTO DE INPUTS ---
 tela.onkey(jogador.mover_direita, 'Right') # Bind da tecla Direita
 tela.onkey(jogador.mover_esquerda, 'Left') # Bind da tecla Esquerda
-
-def desenhar_botao_reiniciar():
-    botao_reiniciar.clear()
-    botao_reiniciar.goto(-90, -120)
-    botao_reiniciar.pendown()
-    botao_reiniciar.color('white', 'darkgreen')
-    botao_reiniciar.begin_fill()
-    for _ in range(2):
-        botao_reiniciar.forward(180)
-        botao_reiniciar.left(90)
-        botao_reiniciar.forward(40)
-        botao_reiniciar.left(90)
-    botao_reiniciar.end_fill()
-    botao_reiniciar.penup()
-    botao_reiniciar.goto(0, -110)
-    botao_reiniciar.color('white')
-    botao_reiniciar.write('Reiniciar', align='center', font=('Arial', 16, 'bold'))
-
 
 def game_over():
     mensagem_fim.clear()
@@ -62,20 +39,7 @@ def game_over():
     for carrinho in carro_config.carros:
         carrinho.hideturtle()
     carro_config.carros.clear()
-    desenhar_botao_reiniciar()
-    tela.onscreenclick(reiniciar_jogo)
 
-
-def reiniciar_jogo(x, y):
-    if -90 <= x <= 90 and -120 <= y <= -80:
-        botao_reiniciar.clear()
-        mensagem_fim.clear()
-        pontuacao.clear()
-        pontuacao.pontuacao = 0
-        pontuacao.pontuacao_config()
-        jogador.goto(0, -220)
-        tela.onscreenclick(None)
-        iniciar_jogo()
 
 
 def iniciar_jogo():
@@ -105,5 +69,5 @@ def iniciar_jogo():
 
 iniciar_jogo()
 
-# Mantém a janela aberta após o Game Over até o usuário clicar no botão reiniciar
+# Mantém a janela aberta após o Game Over
 tela.mainloop()
